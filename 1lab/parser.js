@@ -83,15 +83,13 @@ export class Parser {
     //Парсит один кортеж на ключ и значение
     parseElement(element) {
         console.log(element)
-        let newObject = {}
-        newObject.cortege = element.set.map((el) => {
+        return element.set.map((el) => {
             el = el.split('')
             el.shift()
             el.pop()
             el = el.join('')
             return {name: el.split(',')[0], value: Number(el.split(',')[1])}
         })
-        return newObject
     }
 
     //Функция преобразующая множество в новое множество

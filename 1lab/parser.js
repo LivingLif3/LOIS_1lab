@@ -55,7 +55,7 @@ export class Parser {
         let test = this.data.filter((item) => {
             return regExp.test(item)
         })
-        console.log(test);
+        return test
     }
 
     //Парсим предикаты, разделяя на имя множества и значения
@@ -97,11 +97,25 @@ export class Parser {
     //Функция преобразующая множество в новое множество
     changeParcelsAndPredicates() {
         this.predicate = this.predicate.map((item) => {
-            return {name: item.name, cortege: this.parseElement(item)}
+            return {name: item.name, corteges: this.parseElement(item)}
         })
         this.parcel = this.parcel.map((item) => {
-            return {name: item.name, cortege: this.parseElement(item)}
+            return {name: item.name, corteges: this.parseElement(item)}
         })
         console.log(this.predicate, this.predicate)
+    }
+
+    //Запускает работу парсера
+    startParser(){
+        this.splitByLinesExpression()
+        this.deleteSpaces()
+        this.findExpressions()
+        this.eraseWhetherExpression()
+        if (!this.checkRightValueSet()) {
+            process.exit(0)
+        }
+        this.parsePredicates()
+        this.parseParcels()
+        this.changeParcelsAndPredicates()
     }
 }

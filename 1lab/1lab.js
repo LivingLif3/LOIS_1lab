@@ -11,11 +11,8 @@ const main = () => {
 
     //Парсим информацию, которую считали с файла
     let parser = new Parser(data)
-    parser.splitByLinesExpression()
-    parser.deleteSpaces()
-    parser.findExpressions()
-    parser.eraseWhetherExpression()
-    console.log(parser.parsePredicates(), parser.parseParcels())
+    parser.startParser()
+    console.log(parser.predicate, parser.parcel)
 }
 
 main()

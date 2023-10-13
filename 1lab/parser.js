@@ -63,7 +63,9 @@ export class Parser {
         this.predicate = this.predicate.map((el) => {
             el = el.split('=')
             el[1] = el[1].replace(/[}{]/g, '').split('),')
-            el[1][0] += ')'
+            for (let i = 0; i < el[1].length - 1; i++) {
+                el[1][i] += ')'
+            }
             return {name: el[0], set: el[1]}
         })
         return this.predicate
@@ -74,7 +76,9 @@ export class Parser {
         this.parcel = this.parcel.map((el) => {
             el = el.split('=')
             el[1] = el[1].replace(/[}{]/g, '').split('),')
-            el[1][0] += ')'
+            for (let i = 0; i < el[1].length - 1; i++) {
+                el[1][i] += ')'
+            }
             return {name: el[0], set: el[1]}
         })
         return this.parcel
@@ -100,7 +104,16 @@ export class Parser {
         this.parcel = this.parcel.map((item) => {
             return {name: item.name, corteges: this.parseElement(item)}
         })
-        console.log(this.predicate, this.predicate)
+        console.log(this.predicate, this.parcel)
+    }
+
+    checkEmptySet(){
+        this.predicate = this.predicate.filter((item) => {
+            if (item.corteges[0].name) return item
+        })
+        this.parcel = this.parcel.filter((item) => {
+            if (item.corteges[0].name) return item
+        })
     }
 
     //Запускает работу парсера
@@ -115,5 +128,6 @@ export class Parser {
         this.parsePredicates()
         this.parseParcels()
         this.changeParcelsAndPredicates()
+        this.checkEmptySet()
     }
 }

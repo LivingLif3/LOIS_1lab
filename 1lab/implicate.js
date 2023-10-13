@@ -160,3 +160,95 @@ export class Implication {
     }
 
 }
+
+export class ImplicationCopy {
+    constructor(
+        firstSet,
+        secondSet,
+        parcel,
+    ) {
+        this.firstSet = firstSet
+        this.secondSet = secondSet
+        this.parcel = parcel
+    }
+
+    get calculateImplication() {
+        let result = []
+        for(let i = 0; i < this.firstSet.corteges.length; i++) {
+            let row = []
+            let elements = []
+            let value = 0
+            for(let j = 0; j < this.secondSet.corteges.length; j++) {
+                elements = [this.firstSet.corteges[i].name, this.secondSet.corteges[j].name]
+                value = this.implicate(this.firstSet.corteges[i], this.secondSet.corteges[j])
+                row.push([elements, value])
+            }
+            result.push(row)
+        }
+        return result
+    }
+
+    implicate(firstEl, secondEl) {
+        let value = firstEl.value <= secondEl.value ? 1 : secondEl.value
+        return value
+    }
+
+    getElementsExceptOne(el, elements) {
+        return elements.filter(element => element !== el)
+    }
+
+    checkParcelAndResult(result) {
+        let conjunctedMatrix = []
+        if(result.length !== this.parcel.corteges.length) {
+            return;
+        }
+        for(let i = 0; i < result.length; i++) {
+            let row = []
+            for(let j = 0; j < result[i].length; j++) {
+                if(result[i][j][0].indexOf(this.parcel.corteges[i].name) !== -1) { // result[i][j] - [[x1,y1], 0.3]
+                    let el = [this.getElementsExceptOne(this.parcel.corteges[i].name, result[i][j][0]), Math.min(this.parcel.corteges[i].value, result[i][j][1])]
+                    row.push(el)
+                }
+            }
+            conjunctedMatrix.push(row)
+        }
+        return conjunctedMatrix
+    }
+
+    getConclusion(conjuctedMatrix) {
+        let conclusion = []
+        for(let i = 0; i < conjuctedMatrix[0].length; i++) {
+            let column = []
+            for(let j = 0; j < conjuctedMatrix.length; j++) {
+                column.push(conjuctedMatrix[j][i])
+            }
+            column.sort((a, b) => b[1] - a[1])
+            conclusion.push(column[0])
+        }
+        return conclusion
+    }
+
+    showAns(ans) {
+        let string = "{"
+        for(let i = 0; i < ans.length; i++) {
+            let cortege = ""
+            if(ans[i][0].length !== 1) {
+                cortege = `((${ans[i][0].join(',')}),${ans[i][1]})`
+            } else {
+                cortege = `(${ans[i][0].join(',')},${ans[i][1]})`
+            }
+            string += cortege
+            if(i !== ans.length - 1) {
+                string += ','
+            }
+        }
+        string += "}"
+        return string
+    }
+
+    calculate() {
+        let conjuctedMatrix = this.checkParcelAndResult(this.calculateImplication)
+        let ans = this.getConclusion(conjuctedMatrix)
+        console.log(this.showAns(ans))
+    }
+}

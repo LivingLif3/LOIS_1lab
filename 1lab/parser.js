@@ -4,7 +4,7 @@ export class Parser {
     constructor(data) {
         this.data = data
         this.predicate = []
-        this.parcel = []
+        this.rules = []
     }
 
     //Построчно выделяем посылки и предикаты
@@ -26,7 +26,7 @@ export class Parser {
         let quantity = 0
         for (let i = 0; i < this.data.length; i++) {
             if (this.data[i] === '' && quantity === 0) {
-                type = 'parcel'
+                type = 'rule'
                 quantity++
                 continue
             }
@@ -34,8 +34,8 @@ export class Parser {
                 case 'predicate':
                     this.predicate.push(this.data[i])
                     break
-                case 'parcel':
-                    this.parcel.push(this.data[i])
+                case 'rule':
+                    this.rules.push(this.data[i])
                     break
             }
         }
@@ -63,21 +63,12 @@ export class Parser {
         this.predicate = this.predicate.map((el) => {
             el = el.split('=')
             el[1] = el[1].replace(/[}{]/g, '').split('),')
-            el[1][0] += ')'
+            for (let i = 0; i < el[1].length - 1; i++) {
+                el[1][i] += ')'
+            }
             return {name: el[0], set: el[1]}
         })
         return this.predicate
-    }
-
-    //Парсим посылки на имя множества и значения
-    parseParcels() {
-        this.parcel = this.parcel.map((el) => {
-            el = el.split('=')
-            el[1] = el[1].replace(/[}{]/g, '').split('),')
-            el[1][0] += ')'
-            return {name: el[0], set: el[1]}
-        })
-        return this.parcel
     }
 
     //Парсит один кортеж на ключ и значение
@@ -92,16 +83,28 @@ export class Parser {
         })
     }
 
+    parseRules() {
+        this.rules = this.rules.map((el) => {
+            el = el.split('~>')
+            return [el[0], el[1]]
+        })
+    }
+
     //Функция преобразующая множество в новое множество
-    changeParcelsAndPredicates() {
+    changePredicates() {
         this.predicate = this.predicate.map((item) => {
             return {name: item.name, corteges: this.parseElement(item)}
         })
-        this.parcel = this.parcel.map((item) => {
-            return {name: item.name, corteges: this.parseElement(item)}
-        })
-        console.log(this.predicate, this.predicate)
+        console.log(this.predicate)
     }
+
+    //Проверяет вывод на пустые множества
+    checkEmptySet(){
+        this.predicate = this.predicate.filter((item) => {
+            if (item.corteges[0].name) return item
+        })
+    }
+
 
     //Запускает работу парсера
     startParser(){
@@ -113,7 +116,8 @@ export class Parser {
             process.exit(0)
         }
         this.parsePredicates()
-        this.parseParcels()
-        this.changeParcelsAndPredicates()
+        this.parseRules()
+        this.changePredicates()
+        this.checkEmptySet()
     }
 }

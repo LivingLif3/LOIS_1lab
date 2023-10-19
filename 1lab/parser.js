@@ -51,11 +51,20 @@ export class Parser {
 
     //Проверяем на правильность составления множества
     checkRightValueSet() {
-        let regExp = /([A-Z]\d*)=(\{(\([a-z]\d*,\d(\.\d+)?\))(,\([a-z]\d*,\d(\.\d+)?\))*})|\{}/
-        let test = this.data.filter((item) => {
+        let regExp = /^([A-Z]\d*)=(\{(\([a-z]\d*,\d(\.\d+)?\))(,\([a-z]\d*,\d(\.\d+)?\))*})|\{}$/
+        let test = this.predicate.filter((item) => {
             return regExp.test(item)
         })
-        return test
+        return test.length === this.predicate.length
+    }
+
+    //Проверяет на правильность составления правил
+    checkRightValuesRules(){
+        let regExp = /[A-Z]~>[A-Z]/
+        let test = this.rules.filter((item) => {
+            return regExp.test(item)
+        })
+        return test.length === this.rules.length
     }
 
     //Парсим предикаты, разделяя на имя множества и значения
@@ -105,6 +114,18 @@ export class Parser {
         })
     }
 
+    //Проверяет на существование предикатов в правилах
+    checkRules(){
+        let rulesLength = this.rules.length
+        let predicateNames = this.predicate.map((item) => {
+            return item.name
+        })
+        this.rules = this.rules.filter((item) => {
+            return (predicateNames.includes(item[0]) && predicateNames.includes(item[1]))
+        })
+        return rulesLength === this.rules.length
+    }
+
 
     //Запускает работу парсера
     startParser(){
@@ -112,12 +133,14 @@ export class Parser {
         this.deleteSpaces()
         this.findExpressions()
         this.eraseWhetherExpression()
-        if (!this.checkRightValueSet()) {
+        if (!(this.checkRightValueSet() && this.checkRightValuesRules())) {
             process.exit(0)
         }
         this.parsePredicates()
         this.parseRules()
         this.changePredicates()
-        this.checkEmptySet()
+        if(!this.checkRules()) {
+            process.exit(0)
+        }
     }
 }

@@ -126,6 +126,7 @@ export class Parser {
         return rulesLength === this.rules.length
     }
 
+    //Удаляет невозможные правила
     deleteWhetherRules() {
         let emptySetsNames = this.predicate.filter((el) => {
             return el.corteges[0].name === ""
@@ -138,6 +139,13 @@ export class Parser {
                 }
                 i++
             }
+        })
+    }
+
+    //Удаляет пустые предикаты
+    deleteEmptyPredicates(){
+        this.predicate = this.predicate.filter((el) => {
+            return el.corteges[0].name
         })
     }
 
@@ -158,5 +166,6 @@ export class Parser {
             process.exit(0)
         }
         this.deleteWhetherRules()
+        this.deleteEmptyPredicates()
     }
 }

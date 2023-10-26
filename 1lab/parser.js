@@ -60,7 +60,7 @@ export class Parser {
 
     //Проверяет на правильность составления правил
     checkRightValuesRules(){
-        let regExp = /[A-Z]~>[A-Z]/
+        let regExp = /^[A-Z]\d*~>[A-Z]\d*$/
         let test = this.rules.filter((item) => {
             return regExp.test(item)
         })
@@ -126,6 +126,21 @@ export class Parser {
         return rulesLength === this.rules.length
     }
 
+    deleteWhetherRules() {
+        let emptySetsNames = this.predicate.filter((el) => {
+            return el.corteges[0].name === ""
+        })
+        this.rules = this.rules.filter((el) => {
+            let i = 0
+            while (i < emptySetsNames.length) {
+                if (!el.includes(emptySetsNames[i].name)) {
+                    return true
+                }
+                i++
+            }
+        })
+    }
+
 
     //Запускает работу парсера
     startParser(){
@@ -142,5 +157,6 @@ export class Parser {
         if(!this.checkRules()) {
             process.exit(0)
         }
+        this.deleteWhetherRules()
     }
 }

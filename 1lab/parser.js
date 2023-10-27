@@ -135,6 +135,7 @@ export class Parser {
         })
         this.rules = this.rules.filter((el) => {
             let i = 0
+            if (emptySetsNames.length === 0) return true
             while (i < emptySetsNames.length) {
                 if (!el.includes(emptySetsNames[i].name)) {
                     return true
@@ -148,13 +149,6 @@ export class Parser {
     deleteEmptyPredicates(){
         this.predicate = this.predicate.filter((el) => {
             return el.corteges[0].name
-        })
-    }
-
-    //Удаляет пустые строки из правил
-    eraseEmptyStringRules() {
-        this.rules = this.rules.filter((item) => {
-            if (item) return item
         })
     }
 

@@ -23,11 +23,13 @@ export class Parser {
     //Находим выражения, деля на предикаты и посылки
     findExpressions() {
         let type = 'predicate'
+        let regExp = /^[A-Z]\d*~>[A-Z]\d*$/
         let quantity = 0
         for (let i = 0; i < this.data.length; i++) {
-            if (this.data[i] === '' && quantity === 0) {
+            if (regExp.test(this.data[i]) && quantity === 0) {
                 type = 'rule'
                 quantity++
+                i--
                 continue
             }
             switch (type) {
@@ -149,11 +151,30 @@ export class Parser {
         })
     }
 
+    //Удаляет пустые строки из правил
+    eraseEmptyStringRules() {
+        this.rules = this.rules.filter((item) => {
+            if (item) return item
+        })
+    }
+
+    //Удаляет пустые строки до первой посылки
+    eraseEmptyStringData() {
+        let i = 0
+        while (i < this.data.length) {
+            if (!this.data[i]) {
+                this.data.splice(i, 1)
+                i--
+            }
+            i++
+        }
+    }
 
     //Запускает работу парсера
     startParser(){
         this.splitByLinesExpression()
         this.deleteSpaces()
+        this.eraseEmptyStringData()
         this.findExpressions()
         this.eraseWhetherExpression()
         if (!(this.checkRightValueSet() && this.checkRightValuesRules())) {
